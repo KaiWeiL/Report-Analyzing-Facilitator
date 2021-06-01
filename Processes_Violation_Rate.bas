@@ -43,7 +43,8 @@ Sub GenProcessViolationRate()
 '
     
     Dim dataRowNumbers As Integer   'Not including header
-    dataRowNumbers = Cells.Find(What:="*", SearchDirection:=xlPrevious).Row - 1
+    Dim NewDataRowNumbers As Integer
+    dataRowNumbers = Cells.Find(What:="*", SearchDirection:=xlPrevious).Row
     Dim EmptyColn() As String
     Dim LeftMostColn As String   'For metadata deletion
     
@@ -102,8 +103,7 @@ Sub GenProcessViolationRate()
     Columns("C").EntireColumn.AutoFit
 
         ' Remove duplicate rows
-    Range("A2").Select
-    Range(Selection, Selection.End(xlDown)).Select
+    Range("A2").CurrentRegion.Select
     Application.CutCopyMode = False
     ActiveSheet.Range("$A$2:$C$" & dataRowNumbers).RemoveDuplicates Columns:=1, Header:=xlNo
 
@@ -120,13 +120,15 @@ Sub GenProcessViolationRate()
     Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
         :=False, Transpose:=False
     Application.CutCopyMode = False
-    Range("A1").CurrentRegion.Select
+    
+    NewDataRowNumbers = Cells.Find(What:="*", SearchDirection:=xlPrevious).Row ' Select all region
+    Range("A1:C" & NewDataRowNumbers).Select
     Range("B2").Activate
     ActiveWorkbook.Worksheets("Process_Violation_Rate").Sort.SortFields.Clear
     ActiveWorkbook.Worksheets("Process_Violation_Rate").Sort.SortFields.Add2 Key:=Range("B2:B28") _
         , SortOn:=xlSortOnValues, Order:=xlDescending, DataOption:=xlSortNormal
     With ActiveWorkbook.Worksheets("Process_Violation_Rate").Sort
-        .SetRange Range("A1:B28")
+        .SetRange Range("A1:C" & NewDataRowNumbers)
         .Header = xlYes
         .MatchCase = False
         .Orientation = xlTopToBottom
@@ -139,6 +141,8 @@ Sub GenProcessViolationRate()
     Range("A1").Select
     
 End Sub
+
+
 
 
 
